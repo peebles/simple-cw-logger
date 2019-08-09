@@ -1,0 +1,27 @@
+{
+  "name": "simple-cw-logger",
+  "version": "1.0.0",
+  "description": "A simple console.log wrapper for printing to sdtout, to be used with awslogs docker logging engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peebles/simple-cw-logger.git"
+  },
+  "keywords": [
+    "cloudwatch",
+    "logs",
+    "logger"
+  ],
+  "author": "Andrew Peebles",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/peebles/simple-cw-logger/issues"
+  },
+  "homepage": "https://github.com/peebles/simple-cw-logger#readme",
+  "dependencies": {
+    "strftime": "^0.10.0"
+  }
+}
