@@ -7,13 +7,25 @@ class Logger {
       datetime: "%Y-%m-%dT%H:%M:%S%z",
       ...opts
     };
+    if ( opts.colorize ) {
+      this.colors = require( 'colors' );
+      this.opts.colors = {
+        ...this.opts.colors,
+        error: 'red',
+        debug: 'blue',
+        warn: 'magenta',
+      };
+    }
   }
   _log( level, ...args ) {
     let now = strftime(this.opts.datetime);
+    let lvl = `[${level}]`;
+    if ( this.opts.colorize && this.opts.colors[level] )
+      lvl = this.colors[this.opts.colors[level]](lvl);
     if ( this.opts.prefix ) 
-      console.log( `${now} ${this.opts.prefix} [${level}]`, ...args );
+      console.log( `${now} ${this.opts.prefix} ${lvl}`, ...args );
     else
-      console.log( `${now} [${level}]`, ...args );
+      console.log( `${now} ${lvl}`, ...args );
   }
   info(...args) {
     if ( this.opts.level === "error" ) return;
