@@ -23,7 +23,7 @@ class Logger {
     if ( this.opts.colorize && this.opts.colors[level] )
       lvl = this.colors[this.opts.colors[level]](lvl);
     if ( this.opts.prefix ) 
-      console.log( `${now} ${this.opts.prefix} ${lvl}`, ...args );
+      console.log( `${now} ${lvl} ${this.opts.prefix}`, ...args );
     else
       console.log( `${now} ${lvl}`, ...args );
   }
@@ -41,6 +41,15 @@ class Logger {
   }
   error(...args) {
     this._log( "error", ...args );
+  }
+  clone(opts) {
+    let current = {
+      ...this.opts
+    };
+    Object.keys(opts).forEach((k) => {
+      current[k] = opts[k];
+    });
+    return new Logger(current);
   }
 }
 module.exports = Logger;
