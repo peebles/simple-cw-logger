@@ -22,10 +22,17 @@ class Logger {
     let lvl = `[${level}]`;
     if ( this.opts.colorize && this.opts.colors[level] )
       lvl = this.colors[this.opts.colors[level]](lvl);
-    if ( this.opts.prefix ) 
-      console.log( `${now} ${lvl} ${this.opts.prefix}`, ...args );
-    else
+    if ( this.opts.prefix ) {
+      if ( typeof this.opts.prefix === 'function' ) {
+        console.log( `${now} ${lvl} ${this.opts.prefix()}`, ...args );
+      }
+      else {
+        console.log( `${now} ${lvl} ${this.opts.prefix}`, ...args );
+      }
+    }
+    else {
       console.log( `${now} ${lvl}`, ...args );
+    }
   }
   info(...args) {
     if ( this.opts.level === "error" ) return;
