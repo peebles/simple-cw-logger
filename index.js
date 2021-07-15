@@ -58,5 +58,92 @@ class Logger {
     });
     return new Logger(current);
   }
+
+  // returns middleware function that can be used to log requests.
+  //
+  // app.log = new Logger({level: debug});
+  // app.use(app.log.formatter({...}));
+  //
+  formatter(opts) {
+    const defaults = {
+      // array of RegExp matched against req.path, of paths to skip logging
+      dontLogPaths: [],
+      // Function that accepts (req) and returns the message.  Has a default.
+      messageFormatterFcn: null,
+      // Instead of over riding the whole message string, just return a user id to include, given (req)
+      userIdFcn: null,
+      // Total message byte limit
+      messageSizeLimit: 512,
+      // Data elements to mask
+      mask: [
+        'password',
+        'secret'
+      ]
+    };
+    let options = Object.assign({}, defaults, opts||{});
+    let fcn = function(req, res, cb) {
+
+      let path = req.originalUrl || req.path;
+
+      // Dont log check
+      for(let i=0; i<options.dontLogPaths.length; i++) {
+        let re = options.dontLogPaths[i];
+        if (re.test(path)) return cb();
+      }
+
+      let message;
+      if (typeof options.messageFormatterFcn === 'function') {
+        message = options.messageFormatterFcn(req);
+      }
+      else {
+        if (typeof options.userIdFcn === 'function') {
+          let userid = options.userIdFcn(req);
+          message = `${req.method.toUpperCase()} ${path} (${userid})`;
+        }
+        else {
+          message = `${req.method.toUpperCase()} ${path}`;
+        }
+      }
+
+      let q = req.query ? req.query : {};
+      let data = { ...q }; // copy
+
+      if ( (typeof req.body) === 'object' ) {
+        // Don't de-ref file uploads!!
+        if ( ! Buffer.isBuffer(req.body) ) {
+          data = Object.assign({}, data, req.body);
+        }
+      }
+
+      // apply the masks
+      if (options.mask.length) {
+        Object.keys(data).forEach(k => {
+          options.mask.forEach(m => {
+            if ( k.match(RegExp(`${m}`,'i')) ) {
+              data[k] = '(blocked)'
+            }
+          });
+        });
+      }
+
+      // When NODE_ENV is not set or is "local", then the data is printed with
+      // line feeds, otherwise it is sent all on one line.
+      let env = process.env.NODE_ENV || 'local';
+      let datastring = JSON.stringify(data, null, env==='local' ? 2 : 0);
+      if (datastring.length > options.messageSizeLimit) {
+        datastring = JSON.stringify(data);
+        if (datastring.length > options.messageSizeLimit) {
+          let len = datastring.length;
+          datastring = datastring.substr(0, 512) + `(... truncated ${len} bytes to 512 ...)`;
+        }
+      }
+
+      this.info(message, datastring);
+      
+      cb();
+    }
+
+    return fcn.bind(this);
+  }
 }
 module.exports = Logger;
