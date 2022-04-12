@@ -134,7 +134,7 @@ class Logger {
         datastring = JSON.stringify(data);
         if (datastring.length > options.messageSizeLimit) {
           let len = datastring.length;
-          datastring = datastring.substr(0, 512) + `(... truncated ${len} bytes to 512 ...)`;
+          datastring = datastring.substr(0, options.messageSizeLimit) + `(... truncated ${len} bytes to ${options.messageSizeLimit} ...)`;
         }
       }
 

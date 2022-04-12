@@ -1,6 +1,6 @@
 {
   "name": "simple-cw-logger",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A simple console.log wrapper for printing to sdtout, to be used with awslogs docker logging engine",
   "main": "index.js",
   "scripts": {
