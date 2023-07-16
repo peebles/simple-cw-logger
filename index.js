@@ -72,6 +72,9 @@ class Logger {
       messageFormatterFcn: null,
       // Instead of over riding the whole message string, just return a user id to include, given (req)
       userIdFcn: null,
+      // Optional function that takes the data part of the message and returns something to be appended after messageFormatter.
+      // (data, req) where 'data' is log("message", data), and could be a string or an object.
+      dataFormatterFcn: null,
       // Total message byte limit
       messageSizeLimit: 512,
       // Data elements to mask
@@ -126,20 +129,26 @@ class Logger {
         });
       }
 
-      // When NODE_ENV is not set or is "local", then the data is printed with
-      // line feeds, otherwise it is sent all on one line.
-      let env = process.env.NODE_ENV || 'local';
-      let datastring = JSON.stringify(data, null, env==='local' ? 2 : 0);
-      if (datastring.length > options.messageSizeLimit) {
-        datastring = JSON.stringify(data);
+      let datastring;
+      if (typeof options.dataFormatterFcn === 'function') {
+        datastring = options.dataFormatterFcn(data, req);
+      }
+      else {
+        // When NODE_ENV is not set or is "local", then the data is printed with
+        // line feeds, otherwise it is sent all on one line.
+        let env = process.env.NODE_ENV || 'local';
+        datastring = JSON.stringify(data, null, env==='local' ? 2 : 0);
         if (datastring.length > options.messageSizeLimit) {
-          let len = datastring.length;
-          datastring = datastring.substr(0, options.messageSizeLimit) + `(... truncated ${len} bytes to ${options.messageSizeLimit} ...)`;
+          datastring = JSON.stringify(data);
+          if (datastring.length > options.messageSizeLimit) {
+            let len = datastring.length;
+            datastring = datastring.substr(0, options.messageSizeLimit) + `(... truncated ${len} bytes to ${options.messageSizeLimit} ...)`;
+          }
         }
       }
 
       this.info(message, datastring);
-      
+
       cb();
     }
 

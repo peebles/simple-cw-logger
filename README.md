@@ -86,6 +86,7 @@ It will include the method, req.originalUrl and a json object containing the que
 * **mask: ["password", "secret"]** - list of properties in the message you want masked.  The value will be replaced with "blocked" in the log.
 * **userIdFcn: null** - If supplied, will be called with the request object and is expected to return a string.  This will add `(${userIfFcn(req)})` to the log message.  Useful if you have authenticated routes and something like req.user.email exists that you want printed with each log line.
 * **messageFormatterFcn: null** - If supplied, will be called with the request object and is expected to return the log message.  Use this if you want to totally override the log message formatting.
+* **dataFormatterFcn: null** - If supplied, takes (data, req) and should return a string representing the data to be printed at the end of the message.  Can be used to perform truncation or compression on large request bodies for example.
 
 **Example**
 

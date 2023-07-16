@@ -48,3 +48,10 @@ opts = {
   ]
 }
 log.formatter(opts)(req, null, ()=>{});
+
+opts = {
+  dataFormatterFcn: (data, req) => {
+    return `data formatter function: ${JSON.stringify(data)}`
+  }
+};
+log.formatter(opts)(req, null, ()=>{});
