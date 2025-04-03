@@ -1,5 +1,8 @@
 // The Docker awslogs-datetime-format uses strftime
-const strftime = require('strftime');
+import _strftime from 'strftime';
+const strftime = _strftime.default || _strftime;
+import colors from 'colors';
+
 class Logger {
   constructor(opts) {
     this.opts = {
@@ -8,7 +11,6 @@ class Logger {
       ...opts
     };
     if ( opts.colorize ) {
-      this.colors = require( 'colors' );
       this.opts.colors = {
         ...this.opts.colors,
         error: 'red',
@@ -21,7 +23,7 @@ class Logger {
     let now = strftime(this.opts.datetime);
     let lvl = `[${level}]`;
     if ( this.opts.colorize && this.opts.colors[level] )
-      lvl = this.colors[this.opts.colors[level]](lvl);
+      lvl = colors[this.opts.colors[level]](lvl);
     if ( this.opts.prefix ) {
       if ( typeof this.opts.prefix === 'function' ) {
         console.log( `${now} ${lvl} ${this.opts.prefix()}`, ...args );
@@ -155,4 +157,5 @@ class Logger {
     return fcn.bind(this);
   }
 }
-module.exports = Logger;
+
+export default Logger;
